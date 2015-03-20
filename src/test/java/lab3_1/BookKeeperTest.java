@@ -35,5 +35,24 @@ public class BookKeeperTest {
 		assertEquals(result,expected);
 		
 	}
+	
+	
+	
+	
+	
+	
+	@Test
+	public void GivenTwoItemsInvoiceRequest_WhenIssuanceInovked_ThenTwoTaxCalculateInvoke() {
+		InvoiceFactory invoiceF = new InvoiceFactory();
+		BookKeeper bk = new BookKeeper(invoiceF);
+		ClientData klient = new ClientData(new Id("1"),"ktos");
+		InvoiceRequest ir = new InvoiceRequest(klient);
+		ir.add(new RequestItem(new ProductData(new Id("1"),new Money(20), "cos", ProductType.DRUG, null),20,new Money(20)));
+		ir.add(new RequestItem(new ProductData(new Id("2"),new Money(20), "cos", ProductType.DRUG, null),20,new Money(20)));
+		TaxPolicy tp = Mockito.mock(TaxPolicy.class);
+		Mockito.when(tp.calculateTax(ProductType.DRUG, new Money(20))).thenReturn(new Tax(new Money(20),"powod"));
+		int result = bk.issuance(ir, tp).getItems().size();
+		Mockito.verify(tp, Mockito.times(2)).calculateTax(ProductType.DRUG, new Money(20));
+	}
 
 }
